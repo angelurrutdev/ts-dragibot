@@ -1,0 +1,36 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno
+.env
+.env.local
+.env.*.local
+
+# Archivos de registro y depuración
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.DS_Store
+
+# Carpetas de compilación
+build/
+dist/
+out/
+
+# Archivos de caché
+.cache/
+
+# Archivos temporales de editores
+*.swp
+*.swo
+.vscode/
+
+# Ignorar archivos de sistema operativo (ejemplo macOS)
+.DS_Store
+.AppleDouble
+.LSOverride
+
+
+# Archivos de paquetes
+package-lock.json
+yarn.lock
