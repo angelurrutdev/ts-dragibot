@@ -1,4 +1,4 @@
-import type { AnySelectMenuInteraction, ButtonInteraction, ChatInputCommandInteraction, Client, ClientEvents, Collection, SharedSlashCommand, SlashCommandBuilder } from "discord.js"
+import type { ChatInputCommandInteraction, Client, ClientEvents, Collection, SharedSlashCommand } from "discord.js"
 import { CONFIG } from "../consts"
 
 export type GlobClient = Client<true> & ExtraClient
@@ -17,6 +17,7 @@ export interface Event<T extends keyof ClientEvents> {
 }
 
 export interface Command {
+    [x: string]: any
     data: SharedSlashCommand
     developer?: boolean
     execute: (client: GlobClient, interaction: ChatInputCommandInteraction) => void
