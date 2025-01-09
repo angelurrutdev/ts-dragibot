@@ -1,6 +1,6 @@
 import 'dotenv/config'
 
-import { Client, Collection } from 'discord.js'
+import { ActivityType, Client, Collection } from 'discord.js'
 import { GlobClient } from './types/index'
 import { handleevents } from './handlers/events'
 import { CONFIG } from './consts'
@@ -12,7 +12,19 @@ const client = new Client({
 client.config = CONFIG
 client.events = new Collection()
 client.commands = new Collection()
-
 handleevents(client)
+
+
+client.on('ready', () => {
+    client.user.setPresence({
+        activities: [{
+            name: 'a DrageonX',
+            type: ActivityType.Watching,
+            url: 'https://www.tiktok.com/@drageonx'
+        }],
+        status: 'online',
+
+    });
+});
 
 client.login(process.env.DISCORD_TOKEN)
