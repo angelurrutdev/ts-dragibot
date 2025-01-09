@@ -1,4 +1,4 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction, TextChannel, DMChannel, NewsChannel, ThreadChannel } from 'discord.js';
+import { SlashCommandBuilder, ChatInputCommandInteraction, TextChannel, DMChannel, NewsChannel, ThreadChannel, PermissionFlagsBits } from 'discord.js';
 import type { Command } from '../../types/index';
 
 export const command: Command = {
@@ -6,6 +6,7 @@ export const command: Command = {
         .setName('say')
         .setDescription('El bot envía un mensaje por ti.')
         .setDMPermission(false)
+        .setDefaultMemberPermissions(PermissionFlagsBits.Administrator)
         .addStringOption(option =>
             option.setName('mensaje')
                 .setDescription('El mensaje que se enviará.')
