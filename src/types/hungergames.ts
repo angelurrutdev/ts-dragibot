@@ -6,7 +6,7 @@ export interface Tributo {
     nombre?: string; 
     vivo: boolean;
     vida: number;
-    inventario: [];
+    inventario: String[];
     avatar: string;
 }
 
@@ -29,62 +29,50 @@ export async function ejecutarEvento(
         return "";
     };
 
-    if (resultado < 0.15) {
-        // Emboscada
-        danio = Math.floor(Math.random() * 8) + 4;
-        mensajeEvento = `¡**${tributo1[1].nombre}** tendió una emboscada y dañó a ${tributo2 ? `**${tributo2[1].nombre}**` : "nadie"} por ${danio / 2} ❤️!` + (tributo2 ? aplicarDanio(tributo2, danio) : ""); 
-    } else if (resultado < 0.45) { 
-        // Grupo de eventos con mayor probabilidad (30%)
-        const eventosPosibles = [
-            // Encontrar armas
-            `¡**${tributo1[1].nombre}** encontró un hacha oxidada 🪓 en una cabaña abandonada!`,
-            `¡**${tributo1[1].nombre}** tropezó con una mochila y encontró una ballesta 🏹 y algunas flechas!`,
-            `¡Mientras exploraba, **${tributo1[1].nombre}** descubrió una espada rota 🗡️ clavada en una roca!`,
-            `¡**${tributo1[1].nombre}** encontró un cuchillo afilado 🔪 escondido en un tronco hueco!`,
-
-            // Hacer armas
-            `¡**${tributo1[1].nombre}** usó su ingenio y algunas ramas para construir un arco improvisado 🏹!`,
-            `¡**${tributo1[1].nombre}** afiló una piedra con paciencia y creó una lanza rudimentaria !`,
-            `¡Con pedazos de hierro oxidado, **${tributo1[1].nombre}** logró forjar una espada tosca pero efectiva 🗡️!`,
-            `¡**${tributo1[1].nombre}** recolectó algunas piedras y las ató a un palo para crear un garrote improvisado!`,
-
-            // Curarse
-            `¡**${tributo1[1].nombre}** encontró algunas hierbas medicinales 🌿 y se curó 5 ❤️!`,
-            `¡**${tributo1[1].nombre}** descansó en una cueva tranquila y recuperó 3 ❤️!`,
-            `¡**${tributo1[1].nombre}** bebió agua de un manantial cristalino y se sintió revitalizado, recuperando 2 ❤️!`,
-            `¡Milagrosamente, **${tributo1[1].nombre}** encontró un botiquín de primeros auxilios completo y se curó por completo (20 ❤️)!`,
-
-            // Morir por decisiones arriesgadas
-            `¡**${tributo1[1].nombre}** intentó saltar un barranco pero falló, cayendo a su muerte!`,
-            `¡**${tributo1[1].nombre}** pensó que era buena idea comer unas bayas desconocidas... y resultó que eran venenosas!`,
-            `¡**${tributo1[1].nombre}** se acercó demasiado a un nido de avispas 🐝 y murió por las picaduras!`,
-
-            // Otros eventos
-            `¡**${tributo1[1].nombre}** encontró un mapa 🗺️ que podría llevar a un tesoro escondido!`,
-            `¡**${tributo1[1].nombre}** se encontró con un anciano ermitaño 🧙‍♂️ que le dio un consejo críptico!`,
-            `¡**${tributo1[1].nombre}** escuchó un rugido aterrador en la distancia... ¿Qué será?`,
-            `¡**${tributo1[1].nombre}** encontró un río 🏞️ lleno de peces 🐟!`,
-        ];
-        mensajeEvento = eventosPosibles[Math.floor(Math.random() * eventosPosibles.length)];
+    if (resultado < 0.20) { 
+        // Encontrar armas (20% de probabilidad)
+        const armas = ["hacha 🪓", "ballesta 🏹", "espada rota 🗡️", "cuchillo afilado 🔪", "lanza improvisada", "garrote", "arco improvisado"];
+        const arma = armas[Math.floor(Math.random() * armas.length)];
+        tributos[tributo1[0]].inventario.push(arma);
+        mensajeEvento = `¡**${tributo1[1].nombre}** encontró un ${arma}!`;
+    } else if (resultado < 0.40 && tributo2) {
+        // Intentar robar arma (20% de probabilidad)
+        if (tributos[tributo2[0]].inventario.length > 0) {
+            const armaRobada = tributos[tributo2[0]].inventario.splice(Math.floor(Math.random() * tributos[tributo2[0]].inventario.length), 1)[0];
+            tributos[tributo1[0]].inventario.push(armaRobada);
+            mensajeEvento = `¡**${tributo1[1].nombre}** le robó un ${armaRobada} a **${tributo2[1].nombre}**!`;
+        } else {
+            mensajeEvento = `¡**${tributo1[1].nombre}** intentó robarle un arma a **${tributo2[1].nombre}**, pero no tenía ninguna!`;
+        }
     } else if (resultado < 0.60 && tributo2) {
-        // Refugio
-        mensajeEvento = `¡**${tributo2[1].nombre}** encontró un refugio seguro 🌳 para pasar la noche!`; 
-    } else if (resultado < 0.75 && tributo2) {
-        // Batalla
-        danio = Math.floor(Math.random() * 4) + 2;
-        mensajeEvento = `¡**${tributo1[1].nombre}** y **${tributo2[1].nombre}** se enfrentaron en una dura batalla ⚔️ y ambos sufrieron ${danio / 2} ❤️ de daño!` + aplicarDanio(tributo1, danio) + aplicarDanio(tributo2, danio); 
-    } else if (resultado < 0.85) {
-        // Kit de primeros auxilios
-        tributos[tributo1[0]].vida = Math.min(tributos[tributo1[0]].vida + 4, 20);
-        mensajeEvento = `¡**${tributo1[1].nombre}** encontró un kit de primeros auxilios ⛑️! Se ha curado 2 ❤️.`; 
-    } else {
-        // Ataque de avispas
-        danio = Math.floor(Math.random() * 6) + 3;
-        mensajeEvento = `¡${tributo2 ? `**${tributo2[1].nombre}**` : "un oso"} fue atacado por un enjambre de avispas 🐝 y sufrió ${danio / 2} ❤️ de daño!` + (tributo2 ? aplicarDanio(tributo2, danio) : ""); 
+        // Pelea con armas (20% de probabilidad)
+        if (tributos[tributo1[0]].inventario.length > 0 && tributos[tributo2[0]].inventario.length > 0) {
+            danio = Math.floor(Math.random() * 10) + 5;
+            mensajeEvento = `¡**${tributo1[1].nombre}** y **${tributo2[1].nombre}** se enfrentaron en una batalla! ⚔️\n` 
+                + `**${tributo1[1].nombre}** usó su ${tributos[tributo1[0]].inventario[0]} y **${tributo2[1].nombre}** usó su ${tributos[tributo2[0]].inventario[0]}!\n`
+                + `Ambos sufrieron ${danio / 2} ❤️ de daño!` 
+                + aplicarDanio(tributo1, danio) + aplicarDanio(tributo2, danio);
+        } else {
+            mensajeEvento = `¡**${tributo1[1].nombre}** y **${tributo2[1].nombre}** intentaron pelear, pero uno de ellos no tenía un arma!`;
+        }
+    } else if (resultado < 0.80 && tributo2) {
+        // Formar una alianza (20% de probabilidad)
+        mensajeEvento = `¡**${tributo1[1].nombre}** y **${tributo2[1].nombre}** decidieron formar una alianza!🤝`;
+    } else { 
+        // Traicionar a un aliado (20% de probabilidad)
+        if (tributo2) {
+            danio = Math.floor(Math.random() * 8) + 4;
+            mensajeEvento = `¡**${tributo1[1].nombre}** traicionó a **${tributo2[1].nombre}** y lo atacó por la espalda! 🔪\n`
+                + `**${tributo2[1].nombre}** sufrió ${danio} ❤️ de daño!`
+                + aplicarDanio(tributo2, danio);
+        } else {
+            const nuevoResultado = Math.random(); 
+            ejecutarEvento(tributo1, tributo2, nuevoResultado, tributos, interaction); 
+        }
     }
 
     const embedEvento = new EmbedBuilder()
-        .setColor("Red")
+        .setColor("Random")
         .setDescription(mensajeEvento);
 
     if (tributo2) { 

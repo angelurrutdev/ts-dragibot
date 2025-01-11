@@ -6,8 +6,9 @@ import {
     ButtonBuilder, 
     ButtonStyle, 
     EmbedBuilder,
-    TextChannel,
-    User
+    User,
+    Role,
+    GuildMemberRoleManager
 } from 'discord.js';
 import type { Command, GlobClient } from '../../types/index';
 import { Tributo, ejecutarEvento } from '../../types/hungergames';
@@ -22,6 +23,11 @@ export const command: Command = {
             subcommand
                 .setName('iniciar')
                 .setDescription('Inicia los Juegos del Hambre')
+                .addRoleOption(option =>
+                    option.setName('rol')
+                    .setDescription('El rol que puede participar en los juegos')
+                    .setRequired(false)
+                )
                 .addUserOption(option => 
                     option.setName('tributo1')
                     .setDescription('Añade un tributo')
@@ -32,7 +38,17 @@ export const command: Command = {
                     .setDescription('Añade otro tributo')
                     .setRequired(false)
                 ) 
-            
+                .addUserOption(option => 
+                    option.setName('tributo3')
+                    .setDescription('Añade otro tributo')
+                    .setRequired(false)
+                )
+                .addUserOption(option => 
+                    option.setName('tributo4')
+                    .setDescription('Añade otro tributo')
+                    .setRequired(false)
+                )
+                
         ),
 
     async execute(client: GlobClient, interaction: ChatInputCommandInteraction) {
@@ -49,10 +65,14 @@ export const command: Command = {
                 return interaction.reply({ content: "¡Los juegos ya están en curso!", ephemeral: true });
             }
 
+            const rolMencionado = interaction.options.getRole('rol') as Role | null;
+
             // Obtener los tributos añadidos manualmente
             const tributosManuales = [
                 interaction.options.getUser('tributo1'),
                 interaction.options.getUser('tributo2'),
+                interaction.options.getUser('tributo3'),
+                interaction.options.getUser('tributo4'),
                 // ... más tributos si se añaden opciones
             ].filter(tributo => tributo !== null) as User[]; 
 
@@ -78,21 +98,35 @@ export const command: Command = {
                         .setStyle(ButtonStyle.Primary)
                 );
 
+
             const embedInicio = new EmbedBuilder()
                 .setColor("Orange")
                 .setTitle("¡Los Juegos del Hambre están por comenzar!")
-                .setDescription("Haz clic en el botón de abajo para registrarte como tributo. Tienes 60 segundos para registrarte.");
+                .setDescription(`Haz clic en el botón de abajo para registrarte como tributo. Tienes 60 segundos para registrarte.${rolMencionado ? `**\nSolo los miembros del rol ${rolMencionado.name} pueden participar.**` : ""}`);
 
             const mensajeInicio = await interaction.reply({ embeds: [embedInicio], components: [row] });
 
             juegoEnCurso = true;
 
-            const collector = mensajeInicio.createMessageComponentCollector({ time: 5000 }); 
+            const collector = mensajeInicio.createMessageComponentCollector({ time: 5000 }); // Tiempo de espera
 
             collector.on('collect', async i => {
                 if (i.customId === 'registrar_tributo') {
                     if (tributos[i.user.id]) {
                         return i.reply({ content: "Ya estás registrado como tributo.", ephemeral: true });
+                    }
+
+                    // Verificar si se mencionó un rol y si el usuario lo tiene
+                    if (rolMencionado && i.member) {
+                        if (i.member.roles instanceof GuildMemberRoleManager) {
+                            if (!i.member.roles.cache.has(rolMencionado.id)) {
+                                return i.reply({ content: `Solo los miembros del rol ${rolMencionado.name} pueden participar.`, ephemeral: true });
+                            }
+                        } else { // i.member.roles es un string[]
+                            if (!i.member.roles.includes(rolMencionado.id)) {
+                                return i.reply({ content: `Solo los miembros del rol ${rolMencionado.name} pueden participar.`, ephemeral: true });
+                            }
+                        }
                     }
 
                     const avatarURL = i.user.displayAvatarURL({ size: 1024 });
