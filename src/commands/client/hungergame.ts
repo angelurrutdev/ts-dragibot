@@ -10,73 +10,7 @@ import {
     User
 } from 'discord.js';
 import type { Command, GlobClient } from '../../types/index';
-
-export interface Tributo {
-    id: string;
-    username: string;
-    nombre?: string; 
-    vivo: boolean;
-    vida: number;
-    inventario: [];
-    avatar: string;
-}
-
-export async function ejecutarEvento(
-    tributo1: [string, Tributo],
-    tributo2: [string, Tributo] | undefined,
-    resultado: number,
-    tributos: { [key: string]: Tributo },
-    interaction: ChatInputCommandInteraction
-) {
-    let mensajeEvento = "";
-    let danio = 0;
-
-    const aplicarDanio = (tributo: [string, Tributo], cantidad: number) => {
-        tributos[tributo[0]].vida -= cantidad;
-        if (tributos[tributo[0]].vida <= 0) {
-            tributos[tributo[0]].vivo = false;
-            return ` ¡${tributo[1].nombre} ha muerto!`;
-        }
-        return "";
-    };
-
-    if (resultado < 0.15) {
-        danio = Math.floor(Math.random() * 8) + 4;
-        mensajeEvento = `¡${tributo1[1].nombre} tendió una emboscada y dañó a ${tributo2 ? tributo2[1].nombre : "nadie"} por ${danio / 2} corazones!` + (tributo2 ? aplicarDanio(tributo2, danio) : "");
-    } else if (resultado < 0.30) {
-        mensajeEvento = `¡${tributo1[1].nombre} y ${tributo2 ? tributo2[1].nombre : "un animal"} se encontraron en una tregua temporal y compartieron provisiones!`;
-    } else if (resultado < 0.45) {
-        mensajeEvento = `¡${tributo1[1].nombre} tropezó con una trampa, pero logró escapar ileso!`;
-    } else if (resultado < 0.60 && tributo2) {
-        mensajeEvento = `¡${tributo2[1].nombre} encontró un refugio seguro para pasar la noche!`;
-    } else if (resultado < 0.75 && tributo2) {
-        danio = Math.floor(Math.random() * 4) + 2;
-        mensajeEvento = `¡${tributo1[1].nombre} y ${tributo2[1].nombre} se enfrentaron en una dura batalla y ambos sufrieron ${danio / 2} corazones de daño!` + aplicarDanio(tributo1, danio) + aplicarDanio(tributo2, danio);
-    } else if (resultado < 0.85) {
-        tributos[tributo1[0]].vida = Math.min(tributos[tributo1[0]].vida + 4, 20);
-        mensajeEvento = `¡${tributo1[1].nombre} encontró un kit de primeros auxilios! Se ha curado 2 corazones.`;
-    } else {
-        danio = Math.floor(Math.random() * 6) + 3;
-        mensajeEvento = `¡${tributo2 ? tributo2[1].nombre : "un oso"} fue atacado por un enjambre de avispas y sufrió ${danio / 2} corazones de daño!` + (tributo2 ? aplicarDanio(tributo2, danio) : "");
-    }
-
-    const embedEvento = new EmbedBuilder()
-        .setColor("Red")
-        .setDescription(mensajeEvento);
-
-    if (tributo1[1].avatar) {
-        embedEvento.setThumbnail(tributo1[1].avatar);
-    }
-    if (tributo2 && tributo2[1].avatar) {
-        embedEvento.setImage(tributo2[1].avatar);
-    }
-
-    if (interaction.channel instanceof TextChannel) {
-        await interaction.channel.send({ embeds: [embedEvento] });
-    } else {
-        console.error("No se pudo enviar el mensaje. El canal no es un canal de texto.");
-    }
-}
+import { Tributo, ejecutarEvento } from '../../types/hungergames';
 
 export const command: Command = {
     data: new SlashCommandBuilder()
@@ -98,7 +32,7 @@ export const command: Command = {
                     .setDescription('Añade otro tributo')
                     .setRequired(false)
                 ) 
-            // Puedes añadir más opciones para tributos si lo necesitas
+            
         ),
 
     async execute(client: GlobClient, interaction: ChatInputCommandInteraction) {
