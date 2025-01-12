@@ -84,7 +84,10 @@ export const command: Command = {
                     username: tributo.username,
                     nombre: tributo.username,
                     vivo: true,
+                    refugio: false,
                     vida: 20,
+                    hambre: 0,
+                    sed: 0,
                     inventario: [],
                     avatar: avatarURL
                 };
@@ -108,7 +111,7 @@ export const command: Command = {
 
             juegoEnCurso = true;
 
-            const collector = mensajeInicio.createMessageComponentCollector({ time: 5000 }); // Tiempo de espera
+            const collector = mensajeInicio.createMessageComponentCollector({ time: 60000 }); // Tiempo de espera
 
             collector.on('collect', async i => {
                 if (i.customId === 'registrar_tributo') {
@@ -137,6 +140,9 @@ export const command: Command = {
                         nombre: i.user.username,
                         vivo: true,
                         vida: 20,
+                        refugio: false,
+                        hambre: 0,
+                        sed: 0,
                         inventario: [],
                         avatar: avatarURL
                     };
@@ -168,7 +174,7 @@ export const command: Command = {
                 juegoEnCurso = false;
                 const embedGanador = new EmbedBuilder()
                     .setColor("Gold")
-                    .setTitle("¡Los Juegos del Hambre han terminado!")
+                    .setTitle("# ¡Los Juegos del Hambre han terminado!")
                     .setDescription(`¡${ganador.nombre} ha sobrevivido y es el ganador!`);
                 return interaction.followUp({ embeds: [embedGanador] }); 
             }
@@ -192,17 +198,16 @@ export const command: Command = {
                     } else {
                         tributo2 = undefined;
                     }
-                    const resultado = Math.random();
-                    eventos.push({ tributo1, tributo2, resultado });
+                    eventos.push({ tributo1, tributo2 });
                 }
 
                 const ejecutarEventosConCooldown = async (eventos: any[], index: number = 0) => {
                     if (index < eventos.length) {
-                        await ejecutarEvento(eventos[index].tributo1, eventos[index].tributo2, eventos[index].resultado, tributos, interaction);
+                        await ejecutarEvento(eventos[index].tributo1, eventos[index].tributo2, tributos, interaction);
                         setTimeout(() => ejecutarEventosConCooldown(eventos, index + 1), 5000);
                     } else {
                         // Mostrar vidas al final de todos los eventos
-                        let mensajeVidas = "**Vidas restantes al final de la ronda:**\n";
+                        let mensajeVidas = "## Vidas restantes al final de la ronda:\n";
                         for (const [id, tributo] of Object.entries(tributos)) {
                             mensajeVidas += `${tributo.nombre}: ${tributo.vida} ❤️ ${tributo.vivo ? "" : "(Muerto)"}\n`;
                         }
@@ -213,7 +218,7 @@ export const command: Command = {
 
                         ronda++;
                         if (tributosVivos.length > 1) {
-                            setTimeout(() => iniciarRonda(client, interaction, tributos), 5000 * ronda); // cooldown de 5 segundos por ronda
+                            setTimeout(() => iniciarRonda(client, interaction, tributos), 2000 * ronda); // cooldown de 5 segundos por ronda
                         }
                     }
                 };
