@@ -18,9 +18,9 @@ handleevents(client)
 client.on('ready', () => {
     client.user.setPresence({
         activities: [{
-            name: 'a DrageonX',
-            type: ActivityType.Watching,
-            url: 'https://www.tiktok.com/@drageonx'
+            name: 'Viendo a ShowAm1',
+            type: ActivityType.Streaming,
+            url: 'https://www.twitch.tv/showam1'
         }],
         status: 'online',
 

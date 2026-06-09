@@ -34,3 +34,9 @@ out/
 # Archivos de paquetes
 package-lock.json
 yarn.lock
+
+# Datos persistentes del bot (contienen IDs reales del servidor)
+tickets-data.json
+
+# Archivos temporales de prueba
+TEST*.txt

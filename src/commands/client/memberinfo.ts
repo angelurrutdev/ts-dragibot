@@ -20,17 +20,14 @@ export const command: Command = {
             .setColor(fetchedMember.user.accentColor || "Green")
             .setAuthor({ name: `${fetchedMember.user.tag} profile`, iconURL: fetchedMember.user.displayAvatarURL() })
             .setDescription(
-                `
-                __**Información del Usuario**__
-                 **ID:** ${fetchedMember.id}
-                 **Nickname:** \`${fetchedMember.nickname || fetchedMember.user.username}\`
-                 **Roles:** (${fetchedMember.roles.cache.size - 1 }): **${fetchedMember.roles.cache.map(r => r ).join(', '.replace('@everyone', "") || "None")                    
-                }
-                **Admin:** \`${fetchedMember.permissions.has(PermissionFlagsBits.Administrator) ? "Si" : "No"}\`
-                **Bot:** ${fetchedMember.user.bot ? "Si" : "No"}
-                **Cuenta Creada:** <t:${(fetchedMember.user.createdTimestamp / 1000).toFixed(0)}:D>
-                **Se ha unido: <t:${(fetchedMember.joinedTimestamp! / 1000).toFixed(0)}:D>
-                `
+                `__**Información del Usuario**__\n` +
+                `**ID:** ${fetchedMember.id}\n` +
+                `**Nickname:** \`${fetchedMember.nickname || fetchedMember.user.username}\`\n` +
+                `**Roles:** (${fetchedMember.roles.cache.size - 1}): ${fetchedMember.roles.cache.filter(r => r.id !== fetchedMember.guild.roles.everyone.id).map(r => r.toString()).join(', ') || 'None'}\n` +
+                `**Admin:** \`${fetchedMember.permissions.has(PermissionFlagsBits.Administrator) ? 'Si' : 'No'}\`\n` +
+                `**Bot:** ${fetchedMember.user.bot ? 'Si' : 'No'}\n` +
+                `**Cuenta Creada:** <t:${(fetchedMember.user.createdTimestamp / 1000).toFixed(0)}:D>\n` +
+                `**Se ha unido:** <t:${(fetchedMember.joinedTimestamp! / 1000).toFixed(0)}:D>`
             )
         ]})
 }}

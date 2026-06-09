@@ -89,7 +89,7 @@ export const command: Command = {
         // Configuración del color
         if (color) {
             if (color === 'Random') {
-                color = Math.floor(Math.random() * 16777215).toString(16) as ColorResolvable; // Genera un color hexadecimal aleatorio
+                color = `#${Math.floor(Math.random() * 16777215).toString(16).padStart(6, '0')}` as ColorResolvable; // Genera un color hexadecimal aleatorio válido
             }
             embed.setColor(color);
         }
